@@ -10,7 +10,7 @@ A simple java library that allows you to read the contents of a torrent file.
 
     public class Torrent {
         String announce;
-        Long totalLength = 0L;
+        Long totalLength;
         List<TorrentFile> files;
         String name;
         Long pieceLength;
