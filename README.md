@@ -17,7 +17,7 @@ A simple java library that allows you to read the contents of a torrent file.
         String pieces;
         boolean isSingleFile;
         boolean isPrivate;
-        String infoHash;
+        String infoHash; // null if computeInfoHash is set to false
     
         // Optional fields
         List<List<String>> announceList;

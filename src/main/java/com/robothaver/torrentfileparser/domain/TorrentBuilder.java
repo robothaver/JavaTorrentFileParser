@@ -1,8 +1,5 @@
 package com.robothaver.torrentfileparser.domain;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -34,21 +31,7 @@ public class TorrentBuilder {
     }
 
     public void setInfoHash(byte[] infoBytes) {
-        try {
-            torrent.setInfoHash(getSHAsum(infoBytes));
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String getSHAsum(byte[] input) throws NoSuchAlgorithmException {
-        MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
-        return byteArrayToHex(messageDigest.digest(input));
-    }
-
-    private String byteArrayToHex(byte[] bytes) {
-        HexFormat hex = HexFormat.of();
-        return hex.formatHex(bytes);
+        torrent.setInfoHash(InfoHasCompute.getInfoHash(infoBytes));
     }
 
     private String formatFilePath(String path) {

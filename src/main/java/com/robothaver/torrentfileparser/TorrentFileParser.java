@@ -8,12 +8,14 @@ import java.util.*;
 
 public class TorrentFileParser {
     private final byte[] bytes;
+    private final boolean computeInfoHash;
     private int iterator = 0;
     private TorrentBuilder torrentBuilder = null;
     private int infoDictStartIndex = -1;
 
-    public TorrentFileParser(byte[] bytes) {
+    public TorrentFileParser(byte[] bytes, boolean computeInfoHash) {
         this.bytes = bytes;
+        this.computeInfoHash = computeInfoHash;
     }
 
     private Object parse() throws MalformedTorrentFileException {
@@ -69,14 +71,14 @@ public class TorrentFileParser {
                 }
             } else {
                 map.put(key, parseValue);
+                if (key.equals("info") && computeInfoHash && torrentBuilder != null) {
+                    torrentBuilder.setInfoHash(Arrays.copyOfRange(bytes, infoDictStartIndex, iterator));
+                }
                 if (torrentBuilder != null) {
                     torrentBuilder.processKeyValue(key, parseValue);
                 }
                 key = null;
             }
-        }
-        if (infoDictStartIndex != -1 && torrentBuilder != null) {
-            torrentBuilder.setInfoHash(Arrays.copyOfRange(bytes, infoDictStartIndex, iterator));
         }
         iterator++; // Skipping closing e
         return map;
