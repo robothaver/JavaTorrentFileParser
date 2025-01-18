@@ -10,6 +10,7 @@ public class TorrentFileParser {
     private final byte[] bytes;
     private int iterator = 0;
     private TorrentBuilder torrentBuilder = null;
+    private int infoDictStartIndex = -1;
 
     public TorrentFileParser(byte[] bytes) {
         this.bytes = bytes;
@@ -63,6 +64,9 @@ public class TorrentFileParser {
             Object parseValue = parse();
             if (key == null) {
                 key = String.valueOf(parseValue);
+                if (key.equals("info")) {
+                    infoDictStartIndex = iterator;
+                }
             } else {
                 map.put(key, parseValue);
                 if (torrentBuilder != null) {
@@ -70,6 +74,9 @@ public class TorrentFileParser {
                 }
                 key = null;
             }
+        }
+        if (infoDictStartIndex != -1 && torrentBuilder != null) {
+            torrentBuilder.setInfoHash(Arrays.copyOfRange(bytes, infoDictStartIndex, iterator));
         }
         iterator++; // Skipping closing e
         return map;

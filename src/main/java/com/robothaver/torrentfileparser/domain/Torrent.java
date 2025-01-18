@@ -13,6 +13,7 @@ public class Torrent {
     private Long totalLength = 0L;
     private String pieces;
     private final List<TorrentFile> files = new ArrayList<>();
+    private String infoHash;
 
     // Optional fields
     private List<List<String>> announceList = null;
@@ -139,6 +140,14 @@ public class Torrent {
         this.azureusProperties = azureusProperties;
     }
 
+    public String getInfoHash() {
+        return infoHash;
+    }
+
+    public void setInfoHash(String infoHash) {
+        this.infoHash = infoHash;
+    }
+
     @Override
     public String toString() {
         return "Torrent{" +
@@ -149,6 +158,7 @@ public class Torrent {
                 ", isPrivate=" + isPrivate +
                 ", totalLength=" + totalLength +
                 ", files=" + files +
+                ", infoHash='" + infoHash + '\'' +
                 ", announceList=" + announceList +
                 ", creator='" + creator + '\'' +
                 ", creationDate=" + creationDate +
