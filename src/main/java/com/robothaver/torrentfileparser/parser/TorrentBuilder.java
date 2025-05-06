@@ -1,4 +1,7 @@
-package com.robothaver.torrentfileparser.domain;
+package com.robothaver.torrentfileparser.parser;
+
+import com.robothaver.torrentfileparser.domain.Torrent;
+import com.robothaver.torrentfileparser.domain.TorrentFile;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +30,7 @@ public class TorrentBuilder {
             case "pieces" -> torrent.setPieces(String.valueOf(value));
             case "comment" -> torrent.setComment(String.valueOf(value));
             case "private" -> torrent.setPrivate((long) value == 1);
+            default -> throw new IllegalStateException("Unknown key!");
         }
     }
 

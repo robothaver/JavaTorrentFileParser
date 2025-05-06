@@ -2,6 +2,7 @@ package com.robothaver.torrentfileparser;
 
 import com.robothaver.torrentfileparser.domain.Torrent;
 import com.robothaver.torrentfileparser.exception.MalformedTorrentFileException;
+import com.robothaver.torrentfileparser.parser.TorrentFileParser;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,7 +18,7 @@ public class Main {
             byte[] bytes = Files.readAllBytes(path);
             Instant start = Instant.now();
 
-            TorrentFileParser torrentParser = new TorrentFileParser(bytes);
+            TorrentFileParser torrentParser = new TorrentFileParser(bytes, true);
             Torrent torrent = torrentParser.parseToTorrent();
             System.out.println(torrent.getName());
 

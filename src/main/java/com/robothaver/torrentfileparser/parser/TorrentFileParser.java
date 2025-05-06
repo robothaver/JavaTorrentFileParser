@@ -1,7 +1,6 @@
-package com.robothaver.torrentfileparser;
+package com.robothaver.torrentfileparser.parser;
 
 import com.robothaver.torrentfileparser.domain.Torrent;
-import com.robothaver.torrentfileparser.domain.TorrentBuilder;
 import com.robothaver.torrentfileparser.exception.MalformedTorrentFileException;
 
 import java.util.*;
@@ -41,7 +40,9 @@ public class TorrentFileParser {
     }
 
     public Map<String, Object> parseToMap() throws MalformedTorrentFileException {
-        return (Map<String, Object>) parse();
+        Object parse = parse();
+        iterator = 0;
+        return (Map<String, Object>) parse;
     }
 
     private boolean isInt(byte currentByte) {
