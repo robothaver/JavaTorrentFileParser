@@ -17,6 +17,19 @@ public class TorrentFileParser {
         this.computeInfoHash = computeInfoHash;
     }
 
+    public Torrent parseToTorrent() throws MalformedTorrentFileException {
+        torrentBuilder = new TorrentBuilder();
+        parse();
+        iterator = 0;
+        return torrentBuilder.getTorrent();
+    }
+
+    public Map<String, Object> parseToMap() throws MalformedTorrentFileException {
+        Object parse = parse();
+        iterator = 0;
+        return (Map<String, Object>) parse;
+    }
+
     private Object parse() throws MalformedTorrentFileException {
         return switch (bytes[iterator]) {
             case 'i' -> parseInt();
@@ -30,19 +43,6 @@ public class TorrentFileParser {
                 }
             }
         };
-    }
-
-    public Torrent parseToTorrent() throws MalformedTorrentFileException {
-        torrentBuilder = new TorrentBuilder();
-        parse();
-        iterator = 0;
-        return torrentBuilder.getTorrent();
-    }
-
-    public Map<String, Object> parseToMap() throws MalformedTorrentFileException {
-        Object parse = parse();
-        iterator = 0;
-        return (Map<String, Object>) parse;
     }
 
     private boolean isInt(byte currentByte) {

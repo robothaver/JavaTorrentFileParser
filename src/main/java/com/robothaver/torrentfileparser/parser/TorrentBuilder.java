@@ -30,7 +30,6 @@ public class TorrentBuilder {
             case "pieces" -> torrent.setPieces(String.valueOf(value));
             case "comment" -> torrent.setComment(String.valueOf(value));
             case "private" -> torrent.setPrivate((long) value == 1);
-            default -> throw new IllegalStateException("Unknown key!");
         }
     }
 
