@@ -3,6 +3,7 @@ package com.robothaver.torrentfileparser.parser;
 import com.robothaver.torrentfileparser.domain.Torrent;
 import com.robothaver.torrentfileparser.exception.MalformedTorrentFileException;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class TorrentFileParser {
@@ -98,12 +99,12 @@ public class TorrentFileParser {
         }
         int length;
         try {
-            length = Integer.parseInt(new String(Arrays.copyOfRange(bytes, startIndex, colonIndex)));
+            length = Integer.parseInt(new String(Arrays.copyOfRange(bytes, startIndex, colonIndex), StandardCharsets.UTF_8));
         } catch (NumberFormatException e) {
             throw new MalformedTorrentFileException();
         }
 
-        String value = new String(Arrays.copyOfRange(bytes, colonIndex + 1, colonIndex + length + 1));
+        String value = new String(Arrays.copyOfRange(bytes, colonIndex + 1, colonIndex + length + 1), StandardCharsets.UTF_8);
         iterator += length + 1;
         return value;
     }
@@ -115,6 +116,6 @@ public class TorrentFileParser {
         }
         byte[] valueBytes = Arrays.copyOfRange(bytes, startIndex, iterator);
         iterator++; // Skipping closing e
-        return Long.parseLong(new String(valueBytes));
+        return Long.parseLong(new String(valueBytes, StandardCharsets.UTF_8));
     }
 }
