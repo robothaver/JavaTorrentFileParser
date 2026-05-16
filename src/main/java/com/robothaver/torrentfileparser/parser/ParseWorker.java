@@ -1,6 +1,6 @@
 package com.robothaver.torrentfileparser.parser;
 
-import com.robothaver.torrentfileparser.domain.Torrent;
+import com.robothaver.torrentfileparser.domain.TorrentMetadata;
 import com.robothaver.torrentfileparser.exception.MalformedTorrentFileException;
 
 import java.nio.charset.StandardCharsets;
@@ -20,7 +20,7 @@ class ParseWorker {
         this.infoDictStartIndex = -1;
     }
 
-    public Torrent parseToTorrent() throws MalformedTorrentFileException {
+    public TorrentMetadata parseToMetadata() throws MalformedTorrentFileException {
         torrentBuilder = new TorrentBuilder();
         parse();
         return torrentBuilder.getTorrent();

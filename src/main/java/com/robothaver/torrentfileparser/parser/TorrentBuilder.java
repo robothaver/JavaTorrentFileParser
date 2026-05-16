@@ -1,47 +1,55 @@
 package com.robothaver.torrentfileparser.parser;
 
-import com.robothaver.torrentfileparser.domain.Torrent;
+import com.robothaver.torrentfileparser.domain.TorrentMetadata;
 import com.robothaver.torrentfileparser.domain.TorrentFile;
 
 import java.util.List;
 import java.util.Map;
 
 public class TorrentBuilder {
-    private final Torrent torrent = new Torrent();
+    private final TorrentMetadata torrentMetadata = new TorrentMetadata();
     private Long lastLength;
 
+    @SuppressWarnings("unchecked")
     public void processKeyValue(String key, Object value) {
         switch (key) {
-            case "announce" -> torrent.setAnnounce(String.valueOf(value));
-            case "name" -> torrent.setName(String.valueOf(value));
-            case "announce-list" -> torrent.setAnnounceList((List<List<String>>) value);
-            case "azureus_properties" -> torrent.setAzureusProperties((Map<String, Object>) value);
-            case "created by" -> torrent.setCreator(String.valueOf(value));
-            case "creation date" -> torrent.setCreationDate((long) value);
-            case "encoding" -> torrent.setEncoding(String.valueOf(value));
-            case "files" -> torrent.setSingleFile(false);
+            case "announce" -> torrentMetadata.setAnnounce(String.valueOf(value));
+            case "name" -> torrentMetadata.setName(String.valueOf(value));
+            case "announce-list" -> torrentMetadata.setAnnounceList((List<List<String>>) value);
+            case "azureus_properties" -> torrentMetadata.setAzureusProperties((Map<String, Object>) value);
+            case "created by" -> torrentMetadata.setCreator(String.valueOf(value));
+            case "creation date" -> torrentMetadata.setCreationDate((long) value);
+            case "encoding" -> torrentMetadata.setEncoding(String.valueOf(value));
+            case "files" -> torrentMetadata.setSingleFile(false);
             case "length" -> {
                 lastLength = (long) value;
-                torrent.setTotalLength(torrent.getTotalLength() + lastLength);
+                torrentMetadata.setTotalLength(torrentMetadata.getTotalLength() + lastLength);
             }
-            case "path" -> torrent.getFiles().add(new TorrentFile(lastLength, formatFilePath(String.valueOf(value))));
-            case "piece length" -> torrent.setPieceLength((long) value);
-            case "source" -> torrent.setSource(String.valueOf(value));
-            case "pieces" -> torrent.setPieces(String.valueOf(value));
-            case "comment" -> torrent.setComment(String.valueOf(value));
-            case "private" -> torrent.setPrivate((long) value == 1);
+            case "path" -> parseFile(value);
+            case "piece length" -> torrentMetadata.setPieceLength((long) value);
+            case "source" -> torrentMetadata.setSource(String.valueOf(value));
+            case "pieces" -> torrentMetadata.setPieces(String.valueOf(value));
+            case "comment" -> torrentMetadata.setComment(String.valueOf(value));
+            case "private" -> torrentMetadata.setPrivate((long) value == 1);
+            default -> {
+                if (key.equals("info")) return;
+                torrentMetadata.getOtherValues().put(key, value);
+            }
         }
     }
 
     public void setInfoHash(byte[] infoBytes) {
-        torrent.setInfoHash(InfoHasCompute.getInfoHash(infoBytes));
+        torrentMetadata.setInfoHash(InfoHasCompute.getInfoHash(infoBytes));
     }
 
-    private String formatFilePath(String path) {
-        return path.replace("[", "").replace("]", "").replace(", ", "/");
+    private void parseFile(Object value) {
+        @SuppressWarnings("unchecked")
+        List<String> pathElements = (List<String>) value;
+        String fullPath = String.join("/", pathElements);
+        torrentMetadata.getFiles().add(new TorrentFile(lastLength, fullPath));
     }
 
-    public Torrent getTorrent() {
-        return torrent;
+    public TorrentMetadata getTorrent() {
+        return torrentMetadata;
     }
 }

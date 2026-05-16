@@ -1,10 +1,12 @@
 package com.robothaver.torrentfileparser.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Torrent {
+public class TorrentMetadata {
+    private final Map<String, Object> otherValues = new HashMap<>();
     private String announce;
     private String name;
     private Long pieceLength;
@@ -23,6 +25,10 @@ public class Torrent {
     private String comment = null;
     private String encoding = null;
     private Map<String, Object> azureusProperties = null;
+
+    public Map<String, Object> getOtherValues() {
+        return otherValues;
+    }
 
     public String getAnnounce() {
         return announce;
@@ -150,8 +156,9 @@ public class Torrent {
 
     @Override
     public String toString() {
-        return "Torrent{" +
-                "announce='" + announce + '\'' +
+        return "TorrentMetadata{" +
+                "otherValues=" + otherValues +
+                ", announce='" + announce + '\'' +
                 ", name='" + name + '\'' +
                 ", pieceLength=" + pieceLength +
                 ", isSingleFile=" + isSingleFile +

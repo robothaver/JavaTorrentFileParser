@@ -1,6 +1,6 @@
 package com.robothaver.torrentfileparser;
 
-import com.robothaver.torrentfileparser.domain.Torrent;
+import com.robothaver.torrentfileparser.domain.TorrentMetadata;
 import com.robothaver.torrentfileparser.exception.MalformedTorrentFileException;
 import com.robothaver.torrentfileparser.parser.TorrentFileParser;
 import com.robothaver.torrentfileparser.parser.TorrentFileParserImpl;
@@ -18,10 +18,10 @@ public class Main {
         Instant start = Instant.now();
 
         TorrentFileParser torrentParser = new TorrentFileParserImpl();
-        Torrent torrent = torrentParser.parseToTorrent(bytes, true);
+        TorrentMetadata torrentMetadata = torrentParser.parseToMetadata(bytes, true);
         Instant finish = Instant.now();
 
-        System.out.println(torrent.getName());
+        System.out.println(torrentMetadata.getName());
         long timeElapsed = Duration.between(start, finish).toMillis();
         System.out.println("Parsing finished in " + timeElapsed + "ms");
     }
