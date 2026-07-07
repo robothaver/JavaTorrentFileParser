@@ -1,8 +1,10 @@
 package com.robothaver.torrentfileparser.parser;
 
-import com.robothaver.torrentfileparser.domain.TorrentMetadata;
 import com.robothaver.torrentfileparser.domain.TorrentFile;
+import com.robothaver.torrentfileparser.domain.TorrentMetadata;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,13 +15,13 @@ public class TorrentBuilder {
     @SuppressWarnings("unchecked")
     public void processKeyValue(String key, Object value) {
         switch (key) {
-            case "announce" -> torrentMetadata.setAnnounce(String.valueOf(value));
-            case "name" -> torrentMetadata.setName(String.valueOf(value));
-            case "announce-list" -> torrentMetadata.setAnnounceList((List<List<String>>) value);
+            case "announce" -> torrentMetadata.setAnnounce(parseString(value));
+            case "name" -> torrentMetadata.setName(parseString(value));
+            case "announce-list" -> torrentMetadata.setAnnounceList(parseStringList(value));
             case "azureus_properties" -> torrentMetadata.setAzureusProperties((Map<String, Object>) value);
-            case "created by" -> torrentMetadata.setCreator(String.valueOf(value));
+            case "created by" -> torrentMetadata.setCreator(parseString(value));
             case "creation date" -> torrentMetadata.setCreationDate((long) value);
-            case "encoding" -> torrentMetadata.setEncoding(String.valueOf(value));
+            case "encoding" -> torrentMetadata.setEncoding(parseString(value));
             case "files" -> torrentMetadata.setSingleFile(false);
             case "length" -> {
                 lastLength = (long) value;
@@ -27,9 +29,9 @@ public class TorrentBuilder {
             }
             case "path" -> parseFile(value);
             case "piece length" -> torrentMetadata.setPieceLength((long) value);
-            case "source" -> torrentMetadata.setSource(String.valueOf(value));
-            case "pieces" -> torrentMetadata.setPieces(String.valueOf(value));
-            case "comment" -> torrentMetadata.setComment(String.valueOf(value));
+            case "source" -> torrentMetadata.setSource(parseString(value));
+            case "pieces" -> torrentMetadata.setPieces((byte[]) value);
+            case "comment" -> torrentMetadata.setComment(parseString(value));
             case "private" -> torrentMetadata.setPrivate((long) value == 1);
             default -> {
                 if (key.equals("info")) return;
@@ -38,18 +40,42 @@ public class TorrentBuilder {
         }
     }
 
-    public void setInfoHash(byte[] infoBytes) {
-        torrentMetadata.setInfoHash(InfoHasCompute.getInfoHash(infoBytes));
-    }
-
-    private void parseFile(Object value) {
-        @SuppressWarnings("unchecked")
-        List<String> pathElements = (List<String>) value;
-        String fullPath = String.join("/", pathElements);
-        torrentMetadata.getFiles().add(new TorrentFile(lastLength, fullPath));
+    public void setInfoHash(String infoHash) {
+        torrentMetadata.setInfoHash(infoHash);
     }
 
     public TorrentMetadata getTorrent() {
         return torrentMetadata;
+    }
+
+    private List<List<String>> parseStringList(Object value) {
+        @SuppressWarnings("unchecked")
+        List<List<byte[]>> stringBytes = (List<List<byte[]>>) value;
+        List<List<String>> stringList = new ArrayList<>();
+        for (List<byte[]> byteList : stringBytes) {
+            ArrayList<String> innerStringList = new ArrayList<>();
+            for (byte[] bytes : byteList) {
+                innerStringList.add(parseString(bytes));
+            }
+            stringList.add(innerStringList);
+        }
+        return stringList;
+    }
+
+    private void parseFile(Object value) {
+        List<String> pathElements = new ArrayList<>();
+        @SuppressWarnings("unchecked")
+        List<byte[]> stringBytes = (List<byte[]>) value;
+        for (byte[] bytes : stringBytes) pathElements.add(parseString(bytes));
+
+        String fullPath = String.join("/", pathElements);
+        torrentMetadata.getFiles().add(new TorrentFile(lastLength, fullPath));
+    }
+
+    private String parseString(Object object) {
+        if (object instanceof byte[] bytes) {
+            return new String(bytes, StandardCharsets.UTF_8);
+        }
+        throw new IllegalArgumentException("String value is not an instance of byte[]. Object: " + object);
     }
 }

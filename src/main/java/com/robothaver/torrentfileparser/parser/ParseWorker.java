@@ -8,14 +8,14 @@ import java.util.*;
 
 class ParseWorker {
     private final byte[] bytes;
-    private final boolean computeInfoHash;
+    private final InfoHashCalculator infoHashCalculator;
     private TorrentBuilder torrentBuilder;
     private int iterator;
     private int infoDictStartIndex;
 
-    public ParseWorker(byte[] bytes, boolean computeInfoHash) {
+    public ParseWorker(byte[] bytes, InfoHashCalculator infoHashCalculator) {
         this.bytes = bytes;
-        this.computeInfoHash = computeInfoHash;
+        this.infoHashCalculator = infoHashCalculator;
         this.iterator = 0;
         this.infoDictStartIndex = -1;
     }
@@ -73,15 +73,14 @@ class ParseWorker {
         while (bytes[iterator] != 'e') {
             Object parseValue = parse();
             if (key == null) {
-                key = String.valueOf(parseValue);
+                key = parseDictionaryKey(parseValue);
                 if (key.equals("info")) {
                     infoDictStartIndex = iterator;
                 }
             } else {
                 map.put(key, parseValue);
-                if (key.equals("info") && computeInfoHash && torrentBuilder != null) {
-                    torrentBuilder.setInfoHash(Arrays.copyOfRange(bytes, infoDictStartIndex, iterator));
-                }
+                if (key.equals("info")) tryCalculateInfoHash(map);
+
                 if (torrentBuilder != null) {
                     torrentBuilder.processKeyValue(key, parseValue);
                 }
@@ -92,7 +91,7 @@ class ParseWorker {
         return map;
     }
 
-    private String parseString() throws MalformedTorrentFileException {
+    private Object parseString() throws MalformedTorrentFileException {
         int startIndex = iterator;
         int colonIndex = 0;
         while (iterator < bytes.length) {
@@ -110,9 +109,8 @@ class ParseWorker {
             throw new MalformedTorrentFileException();
         }
 
-        String value = new String(Arrays.copyOfRange(bytes, colonIndex + 1, colonIndex + length + 1), StandardCharsets.UTF_8);
         iterator += length + 1;
-        return value;
+        return Arrays.copyOfRange(bytes, colonIndex + 1, colonIndex + length + 1);
     }
 
     private Long parseInt() {
@@ -123,5 +121,20 @@ class ParseWorker {
         byte[] valueBytes = Arrays.copyOfRange(bytes, startIndex, iterator);
         iterator++; // Skipping closing e
         return Long.parseLong(new String(valueBytes, StandardCharsets.UTF_8));
+    }
+
+    private void tryCalculateInfoHash(Map<String, Object> map) {
+        if (infoHashCalculator == null) return;
+
+        byte[] infoDictionaryBytes = Arrays.copyOfRange(bytes, infoDictStartIndex, iterator);
+        String infoHash = infoHashCalculator.getInfoHash(infoDictionaryBytes);
+        if (torrentBuilder != null) torrentBuilder.setInfoHash(infoHash); else map.put("infoHash", infoHash);
+    }
+
+    private String parseDictionaryKey(Object object) throws MalformedTorrentFileException {
+        if (!(object instanceof byte[])) {
+            throw new MalformedTorrentFileException("Dictionary key must be a string. Key: " + object);
+        }
+        return new String((byte[]) object, StandardCharsets.UTF_8);
     }
 }

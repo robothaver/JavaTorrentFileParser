@@ -13,7 +13,7 @@ public class TorrentMetadata {
     private boolean isSingleFile = true;
     private boolean isPrivate;
     private Long totalLength = 0L;
-    private String pieces;
+    private byte[] pieces;
     private final List<TorrentFile> files = new ArrayList<>();
     private String infoHash;
 
@@ -78,11 +78,11 @@ public class TorrentMetadata {
         this.totalLength = totalLength;
     }
 
-    public String getPieces() {
+    public byte[] getPieces() {
         return pieces;
     }
 
-    public void setPieces(String pieces) {
+    public void setPieces(byte[] pieces) {
         this.pieces = pieces;
     }
 
