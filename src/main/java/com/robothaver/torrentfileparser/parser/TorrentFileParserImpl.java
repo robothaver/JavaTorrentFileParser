@@ -9,11 +9,11 @@ import java.util.Map;
 public class TorrentFileParserImpl implements TorrentFileParser {
     @Override
     public TorrentMetadata parseToMetadata(byte[] bytes, InfoHashCalculator infoHashCalculator) throws MalformedTorrentFileException, NoSuchAlgorithmException {
-        return new ParseWorker(bytes, new InfoHashCalculatorImpl()).parseToMetadata();
+        return new ParseWorker(bytes, infoHashCalculator).parseToMetadata();
     }
 
     @Override
     public Map<String, Object> parseToMap(byte[] bytes, InfoHashCalculator infoHashCalculator) throws MalformedTorrentFileException, NoSuchAlgorithmException {
-        return new ParseWorker(bytes, new InfoHashCalculatorImpl()).parseToMap();
+        return new ParseWorker(bytes, infoHashCalculator).parseToMap();
     }
 }
