@@ -18,7 +18,11 @@ public class TorrentBuilder {
             case "announce" -> torrentMetadata.setAnnounce(parseString(value));
             case "name" -> torrentMetadata.setName(parseString(value));
             case "announce-list" -> torrentMetadata.setAnnounceList(parseStringList(value));
-            case "azureus_properties" -> torrentMetadata.setAzureusProperties((Map<String, Object>) value);
+            case "azureus_properties" -> {
+                Map<String, Object> parsedMap = (Map<String, Object>) value;
+                torrentMetadata.setAzureusProperties(parsedMap);
+                cleanLeakedKeys(parsedMap);
+            }
             case "created by" -> torrentMetadata.setCreator(parseString(value));
             case "creation date" -> torrentMetadata.setCreationDate((long) value);
             case "encoding" -> torrentMetadata.setEncoding(parseString(value));
@@ -46,6 +50,17 @@ public class TorrentBuilder {
 
     public TorrentMetadata getTorrent() {
         return torrentMetadata;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void cleanLeakedKeys(Map<String, Object> azureusProperties) {
+        azureusProperties.forEach((key, value) -> {
+            torrentMetadata.getOtherValues().remove(key);
+
+            if (value instanceof Map<?, ?>) {
+                cleanLeakedKeys((Map<String, Object>) value);
+            }
+        });
     }
 
     private List<List<String>> parseStringList(Object value) {
