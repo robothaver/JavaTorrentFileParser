@@ -12,7 +12,7 @@ public class InfoHashCalculatorImpl implements InfoHashCalculator {
     }
 
     @Override
-    public String getInfoHash(byte[] infoBytes) {
+    public String calculateInfoHash(byte[] infoBytes) {
         return HexFormat.of().formatHex(messageDigest.digest(infoBytes));
     }
 }

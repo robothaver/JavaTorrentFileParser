@@ -20,7 +20,12 @@ public class Main {
         Instant start = Instant.now();
 
         TorrentFileParser torrentParser = new TorrentFileParserImpl();
+
+        // Parse to metadata object
+        // If InfoHashCalculator is provided the info hash will get calculated
         TorrentMetadata torrentMetadata = torrentParser.parseToMetadata(bytes, new InfoHashCalculatorImpl());
+        // Or use torrentParser.parseToMap() to parse to a map
+
         Instant finish = Instant.now();
 
         System.out.println(torrentMetadata.getName());

@@ -127,7 +127,7 @@ class ParseWorker {
         if (infoHashCalculator == null) return;
 
         byte[] infoDictionaryBytes = Arrays.copyOfRange(bytes, infoDictStartIndex, iterator);
-        String infoHash = infoHashCalculator.getInfoHash(infoDictionaryBytes);
+        String infoHash = infoHashCalculator.calculateInfoHash(infoDictionaryBytes);
         if (torrentBuilder != null) torrentBuilder.setInfoHash(infoHash); else map.put("infoHash", infoHash);
     }
 
